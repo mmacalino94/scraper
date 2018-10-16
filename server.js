@@ -1,6 +1,9 @@
 var express = require("express");
-var logger = require("morgan");
+// var mongodb = require("mongodb");
 var mongoose = require("mongoose");
+var logger = require("morgan");
+var exphbs = require("express-handlebars");
+
 
 var axios = require("axios");
 var cheerio = require("cheerio");
@@ -10,13 +13,20 @@ var PORT = 3071;
 var app = express();
 
 app.use(logger("dev"));
-app.use(express.urlencoded({ extended: true }));
+
+app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 app.use(express.static("public"));
 
 var MONGODB_URI = process.env.MONGODB_URI || "mongodb://localhost/scraper";
 
-mongoose.connect(MONGODB_URI,{ useNewUrlParser: true});
+mongoose.connect(MONGODB_URI);
+
+app.engine("handlebars", exphbs ({ defaultLayout: "main" }));
+app.set("view engine", "handlebars");
+
+var routes = require("./controllers/route.js");
+app.use("/", routes);
 
 // mongoose.connect("mongodb://localhost/unit")
 
